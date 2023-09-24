@@ -1,3 +1,4 @@
+local event = require("event")
 local component = require("component")
 local gpu = component.gpu
 local w, h = gpu.getResolution()
@@ -107,6 +108,8 @@ function getCentre(parentWidthOrHeight, childWidthOrHeight)
 end
 
 function Label:setupTextWrapping()
+    -- todo this might work --- please test
+    -- sometimes it misses words
     width = self.parent.width - 4
     textLines = {}
     line = ""
@@ -120,7 +123,7 @@ function Label:setupTextWrapping()
             line = ""
         elseif string.len(testLine) > width then
             table.insert(textLines, line)
-            line = ""
+            line = ""..word
         else
             line = line..word
         end
@@ -149,6 +152,18 @@ function Label:draw()
 end
 
 
+function sayHiTo(name)
+    print("Hello to "..name.."!")
+end
+
+Button = {}
+function Button:new(func, params)
+    local t = setmetatable({}, { __index = Button})
+    t.func = func
+    t.params = params
+    return t
+end
+
 -- Border = {}
 -- function Border:new(name, posX, posY, width, height, colour, borderColour)
 --     local t = setmetatable({}, { __index = Border})
@@ -169,3 +184,15 @@ box:addExistingLabel(myLabel, "t", "l")
 myLabel:setupTextWrapping()
 box:toString()
 box:draw()
+
+local myTestBtn = Button:new(sayHiTo, "Joe")
+
+
+local live = 15
+while live > 0 do
+    local _,_,x,y = event.pull(1,"touch")
+    if x and y then
+        myTestBtn.func(myTestBtn.params)
+    end
+    live = live -1
+end
