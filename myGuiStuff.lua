@@ -106,20 +106,46 @@ function getCentre(parentWidthOrHeight, childWidthOrHeight)
     parentCentre = parentWidthOrHeight / 2
 end
 
+function Label:setupTextWrapping()
+    width = self.parent.width - 4
+    textLines = {}
+    line = ""
+    for word in self.text:gmatch("%S+") do
+        if not (line == "") then 
+            line = line.." " 
+        end
+        testLine = line..word
+        if string.len(testLine) == width then
+            table.insert(textLines, testLine)
+            line = ""
+        elseif string.len(testLine) > width then
+            table.insert(textLines, line)
+            line = ""
+        else
+            line = line..word
+        end
+    end
+    table.insert(textLines, line)
+    self.textLines = textLines
+end
+
 function Label:draw()
-    parent = self.parent
-    -- find middle x
-    parentCentre = parent.width / 2
-    labelWidth = string.len(self.text)
-    self.posX = (parent.posX + parentCentre) - (labelWidth / 2) 
+    print(self.textLines[1])
+    for k, textLine in pairs(self.textLines) do
+        parent = self.parent
+        -- find middle x
+        parentCentre = parent.width / 2
+        textWidth = string.len(textLine)
+        self.posX = (parent.posX + parentCentre) - (textWidth / 2) 
 
-    -- find middle y
-    parentCentre = parent.height / 2
-    labelHeight = 1 -- todo text wrapping stuff
-    self.posY = parentCentre + parent.posY 
+        -- find middle y
+        parentCentre = parent.height / 2
+        textHeight = #self.textLines
+        self.posY = parent.posY + parentCentre + k - (textHeight / 2)
 
-    gpu.setForeground(self.textColour)
-    gpu.set(self.posX, self.posY, self.text)
+        gpu.setForeground(self.textColour)
+        gpu.set(self.posX, self.posY-1, textLine)
+    end
 end
 
 
@@ -138,7 +164,8 @@ end
 -- end
 
 local box = Box:new("box", 30,2, 25,15, colourGreen, colourGrey, testThing)
-local myLabel = Label:new("new", "Read Me!")
+local myLabel = Label:new("new", "Here is a stupid long sentence with which I will demo text wrapping flawlessly on the first try! ...yeah no")
 box:addExistingLabel(myLabel, "t", "l")
+myLabel:setupTextWrapping()
 box:toString()
 box:draw()
