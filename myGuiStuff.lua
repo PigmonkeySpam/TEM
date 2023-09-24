@@ -45,7 +45,7 @@ function Box:draw()
     -- Main box part
     gpu.setBackground(self.colour)
     gpu.fill(self.posX, self.posY, self.width, self.height, " ")
-    
+
     -- Border
     gpu.setForeground(self.borderColour)
     --corners
@@ -53,7 +53,7 @@ function Box:draw()
     gpu.set(self.posX + self.width-1, self.posY, "▜")
     gpu.set(self.posX, self.posY + self.height-1, "▙")
     gpu.set(self.posX + self.width-1, self.posY + self.height-1, "▟")
-
+    
     --top
     gpu.fill(self.posX+1, self.posY, self.width-2, 1, "🮂")
     --right
@@ -62,9 +62,24 @@ function Box:draw()
     gpu.fill(self.posX+1, self.posY+self.height-1, self.width-2, 1, "▂")
     --left
     gpu.fill(self.posX, self.posY+1, 1, self.height-2, "▌")
-
+    
+    -- Labels
+    for k, label in pairs(self.labels) do
+        print(k)
+        label:draw()
+    end
 end
 
+function Box:addExistingLabel(label, alignVertical, alignHorizontal) 
+    label:setupParent(self, alignVertical, alignHorizontal)
+    table.insert(self.labels, label)
+end
+
+function Box:addBasicLabel(text)
+    label = Label:new("basic", text)
+    label:setupParent(self, "T", "L")
+    table.insert(self.labels, label)
+end
 
 Label = {}
 function Label:new(name, text, textColour, posX, posY)
@@ -80,8 +95,14 @@ function Label:new(name, text, textColour, posX, posY)
     return t
 end
 
-function Label:sayHi()
-    print("Hi I'm "..self.name)
+function Label:setupParent(parent, alignVertical, alignHorizontal) 
+    self.parent = (parent or false)
+    self.alignVertical = (alignVertical or false)
+    self.alignHorizontal = (alignHorizontal or false)
+end
+
+function Label:draw()
+    gpu.set(self.posX, self.posY, self.text)
 end
 
 
@@ -100,7 +121,7 @@ end
 -- end
 
 local box = Box:new("box", 30,2, 25,15, colourGreen, colourGrey, testThing)
-local lable:new("new", "Read Me!")
--- table.insert(box.lables,)
+local myLabel = Label:new("new", "Read Me!")
+box:addExistingLabel(myLabel, "t", "l")
 box:toString()
 box:draw()
