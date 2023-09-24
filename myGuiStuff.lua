@@ -101,7 +101,24 @@ function Label:setupParent(parent, alignVertical, alignHorizontal)
     self.alignHorizontal = (alignHorizontal or false)
 end
 
+
+function getCentre(parentWidthOrHeight, childWidthOrHeight)
+    parentCentre = parentWidthOrHeight / 2
+end
+
 function Label:draw()
+    parent = self.parent
+    -- find middle x
+    parentCentre = parent.width / 2
+    labelWidth = string.len(self.text)
+    self.posX = (parent.posX + parentCentre) - (labelWidth / 2) 
+
+    -- find middle y
+    parentCentre = parent.height / 2
+    labelHeight = 1 -- todo text wrapping stuff
+    self.posY = parentCentre + parent.posY 
+
+    gpu.setForeground(self.textColour)
     gpu.set(self.posX, self.posY, self.text)
 end
 
