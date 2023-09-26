@@ -108,8 +108,6 @@ function getCentre(parentWidthOrHeight, childWidthOrHeight)
 end
 
 function Label:setupTextWrapping()
-    -- todo this might work --- please test
-    -- sometimes it misses words
     width = self.parent.width - 4
     textLines = {}
     line = ""
@@ -123,7 +121,7 @@ function Label:setupTextWrapping()
             line = ""
         elseif string.len(testLine) > width then
             table.insert(textLines, line)
-            line = ""..word
+            line = ""..word -- should have fixed it
         else
             line = line..word
         end
