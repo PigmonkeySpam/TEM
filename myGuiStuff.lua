@@ -25,9 +25,7 @@ function ScreenContainer:new(name, backgroundColour)
     return t
 end
 
-function ScreenContainer:clickWithinXY(x,y, item)
-    -- print("item.posX <= x and x <= item.posX + item.width")
-    -- print("item.posX:"..item.posX.." <= x:"..x.." and x:"..x.." <= "..item.posX + item.width..":item.posX + item.width")
+function ScreenContainer:isClickWithinXY(x,y, item)
     if (item.posX <= x and x < item.posX + item.width) then
         if item.posY <= y and y < item.posY + item.height then
             return true
@@ -39,7 +37,7 @@ end
 function ScreenContainer:processClick(x, y)
     for id, item in pairs(self.components) do
         if item.type == "btn" then
-            if self:clickWithinXY(x,y, item.box) then
+            if self:isClickWithinXY(x,y, item.box) then
                 item:clicked()
                 return id
             end
