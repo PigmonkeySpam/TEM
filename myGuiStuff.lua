@@ -12,24 +12,48 @@ local colourBlue = 0x0000FF
 local colourRed = 0xFF0000
 
 
+ScreenContainer = {}
+function ScreenContainer:new(name, backgroundColour)
+    local t = setmetatable({}, { __index = ScreenContainer})
 
--- RectanglePoints = {}
--- function RectanglePoints:new(posX, posY, width, height)
---     local t = setmetatable({}, { __index = RectanglePoints})
+    t.name = name
+    t.type = "screen_container"
+    t.width, t.height = gpu.getResolution()
+    t.backgroundColour = (backgroundColour or 0x000000) -- default black
+    t.components = {}
 
---     t.posX = (posX or 2)
---     t.posY = (posY or 2)
---     t.width = (width or 10)
---     t.height = (height or 10)
+    return t
+end
 
---     return t
--- end
+function ScreenContainer:clickWithinXY(x,y, item)
+    -- print("item.posX <= x and x <= item.posX + item.width")
+    -- print("item.posX:"..item.posX.." <= x:"..x.." and x:"..x.." <= "..item.posX + item.width..":item.posX + item.width")
+    if (item.posX <= x and x < item.posX + item.width) then
+        if item.posY <= y and y < item.posY + item.height then
+            return true
+        end
+    end
+    return false
+end
+
+function ScreenContainer:processClick(x, y)
+    for id, item in pairs(self.components) do
+        if item.type == "btn" then
+            if self:clickWithinXY(x,y, item.box) then
+                item:clicked()
+                return id
+            end
+        end
+    end
+end
+
 
 Box = {}
 function Box:new(name, posX, posY, width, height, colour, borderColour)
     local t = setmetatable({}, { __index = Box})
 
     t.name = name
+    t.type = "box"
     t.posX = (posX or 2)
     t.posY = (posY or 2)
     t.width = (width or 10)
@@ -95,6 +119,7 @@ function Label:new(name, text, textColour, posX, posY)
     local t = setmetatable({}, { __index = Label})
 
     t.name = name
+    t.type = "label"
     t.text = (text or "I'm so empty")
     t.textColour = (textColour or 0xFFFFFF)
     t.backgroundColour = (backgroundColour or 0x000000)
@@ -163,9 +188,11 @@ function sayHiTo(name)
 end
 
 Button = {}
-function Button:new(func, funcInput, box, clickSeconds, clickedColour, clickedBorderColour, clickedLabelColour)
+function Button:new(name, func, funcInput, box, clickSeconds, clickedColour, clickedBorderColour, clickedLabelColour)
     local t = setmetatable({}, { __index = Button})
     
+    t.name = name
+    t.type = "btn"
     t.func = func
     t.params = funcInput
     t.box = box
@@ -186,20 +213,10 @@ function Button:clicked()
 end
 
 
--- Border = {}
--- function Border:new(name, posX, posY, width, height, colour, borderColour)
---     local t = setmetatable({}, { __index = Border})
+-- Todo: separate border object that can be bound to other objects?
 
---     t.posX = (posX or 2)
---     t.posY = (posY or 2)
---     t.width = (width or 10)
---     t.height = (height or 10)
---     t.colour = (colour or 0x00FF00) -- default green
---     t.borderColour = (borderColour or 0xD2D2D2) -- default grey
 
---     return t
--- end
-
+local screen = ScreenContainer:new("screen")
 local box = Box:new("box", 30,2, 25,15, colourGreen, colourGrey, testThing)
 local myLabel = Label:new("new", "Here is a stupid long sentence with which I will demo text wrapping flawlessly on the first try! ...yeah no")
 box:addExistingLabel(myLabel, "t", "l")
@@ -207,16 +224,15 @@ myLabel:setupTextWrapping()
 box:toString()
 box:draw()
 
-local myTestBtn = Button:new(sayHiTo, "Joe", box, 0.5, colourRed, colourBlue)
+local myTestBtn = Button:new("name", sayHiTo, "Joe", box, 0.5, colourRed, colourBlue)
+table.insert(screen.components, myTestBtn)
 
 
 local live = 15
 while live > 0 do
     local _,_,x,y = event.pull(1,"touch")
     if x and y then
-        -- myTestBtn.func(myTestBtn.params)
-        myTestBtn:clicked()
-        -- print(myTestBtn.box.colour)
+        screen:processClick(x, y)
     end
     live = live -1
 end
