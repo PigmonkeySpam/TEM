@@ -7,6 +7,9 @@ local colourBlack = 0x000000
 local colourGrey = 0xD2D2D2
 local colourWhite = 0xFFFFFF
 local colourGreen = 0x00FF00
+local colourLightBlue = 0x00FFFF
+local colourBlue = 0x0000FF
+local colourRed = 0xFF0000
 
 
 
@@ -42,13 +45,19 @@ function Box:toString()
     print("posX: "..self.posX)
 end
 
-function Box:draw()
+function Box:draw(boxColour, borderColour)
+    if boxColour == nil then boxColour = self.colour end
+    -- print("1) borderColour: "..(borderColour or "nil")..", self.borderColour: "..self.borderColour)
+    if borderColour == nil then borderColour = self.borderColour end
+    -- print("2) borderColour: "..borderColour..", self.borderColour: "..self.borderColour)
+
+
     -- Main box part
-    gpu.setBackground(self.colour)
+    gpu.setBackground(boxColour)
     gpu.fill(self.posX, self.posY, self.width, self.height, " ")
 
     -- Border
-    gpu.setForeground(self.borderColour)
+    gpu.setForeground(borderColour)
     --corners
     gpu.set(self.posX, self.posY, "▛")
     gpu.set(self.posX + self.width-1, self.posY, "▜")
@@ -66,7 +75,6 @@ function Box:draw()
     
     -- Labels
     for k, label in pairs(self.labels) do
-        print(k)
         label:draw()
     end
 end
@@ -121,7 +129,7 @@ function Label:setupTextWrapping()
             line = ""
         elseif string.len(testLine) > width then
             table.insert(textLines, line)
-            line = ""..word -- should have fixed it
+            line = ""..word
         else
             line = line..word
         end
@@ -131,7 +139,8 @@ function Label:setupTextWrapping()
 end
 
 function Label:draw()
-    print(self.textLines[1])
+    gpu.setForeground(self.textColour)
+
     for k, textLine in pairs(self.textLines) do
         parent = self.parent
         -- find middle x
@@ -144,7 +153,6 @@ function Label:draw()
         textHeight = #self.textLines
         self.posY = parent.posY + parentCentre + k - (textHeight / 2)
 
-        gpu.setForeground(self.textColour)
         gpu.set(self.posX, self.posY-1, textLine)
     end
 end
@@ -155,12 +163,28 @@ function sayHiTo(name)
 end
 
 Button = {}
-function Button:new(func, params)
+function Button:new(func, funcInput, box, clickSeconds, clickedColour, clickedBorderColour, clickedLabelColour)
     local t = setmetatable({}, { __index = Button})
+    
     t.func = func
-    t.params = params
+    t.params = funcInput
+    t.box = box
+    t.clickSeconds = clickSeconds
+    t.clickedColour = clickedColour
+    t.clickedBorderColour = clickedBorderColour
+    
     return t
 end
+
+function Button:clicked()
+    -- draw clicked colour button
+    self.box:draw(self.clickedColour, self.clickedBorderColour)
+    self.func(self.params)
+    os.sleep(self.clickSeconds)
+    -- and back to normal
+    self.box:draw()
+end
+
 
 -- Border = {}
 -- function Border:new(name, posX, posY, width, height, colour, borderColour)
@@ -183,14 +207,16 @@ myLabel:setupTextWrapping()
 box:toString()
 box:draw()
 
-local myTestBtn = Button:new(sayHiTo, "Joe")
+local myTestBtn = Button:new(sayHiTo, "Joe", box, 0.5, colourRed, colourBlue)
 
 
 local live = 15
 while live > 0 do
     local _,_,x,y = event.pull(1,"touch")
     if x and y then
-        myTestBtn.func(myTestBtn.params)
+        -- myTestBtn.func(myTestBtn.params)
+        myTestBtn:clicked()
+        -- print(myTestBtn.box.colour)
     end
     live = live -1
 end
