@@ -132,6 +132,7 @@ function Label:setupParent(parent, alignVertical, alignHorizontal)
     self.parent = (parent or false)
     self.alignVertical = (alignVertical or false)
     self.alignHorizontal = (alignHorizontal or false)
+    self:setupTextWrapping()
 end
 
 
@@ -159,6 +160,7 @@ function Label:setupTextWrapping()
         end
     end
     table.insert(textLines, line)
+    print(textLines)
     self.textLines = textLines
 end
 
@@ -187,13 +189,13 @@ function sayHiTo(name)
 end
 
 Button = {}
-function Button:new(name, func, funcInput, box, clickSeconds, clickedColour, clickedBorderColour, clickedLabelColour)
+function Button:new(name, func, params, box, clickSeconds, clickedColour, clickedBorderColour, clickedLabelColour)
     local t = setmetatable({}, { __index = Button})
     
     t.name = name
     t.type = "btn"
     t.func = func
-    t.params = funcInput
+    t.params = params
     t.box = box
     t.clickSeconds = clickSeconds
     t.clickedColour = clickedColour
@@ -223,8 +225,15 @@ myLabel:setupTextWrapping()
 box:toString()
 box:draw()
 
+local sealOffBox = Box:new("sealOffBox", 55, 20, 17,5, colourBlue, colourWhite)
+local sealOffLbl = Label:new("Lable", "Seal off")
+sealOffBox:addExistingLabel(sealOffLbl, "T", "L")
+sealOffBox:addBasicLabel("Seal off")
+local sealOffBtn = Button:new("sealOffBtn", sayHiTo, "sealOff", sealOffBox, 0.3, colourGrey, colourBlack)
 local myTestBtn = Button:new("name", sayHiTo, "Joe", box, 0.5, colourRed, colourBlue)
+sealOffBox:draw()
 table.insert(screen.components, myTestBtn)
+table.insert(screen.components, sealOffBtn)
 
 
 local live = 15
