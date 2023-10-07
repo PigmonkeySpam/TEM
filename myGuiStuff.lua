@@ -10,10 +10,13 @@ local colourGreen = 0x00FF00
 local colourLightBlue = 0x00FFFF
 local colourBlue = 0x0000FF
 local colourRed = 0xFF0000
+-- todo: checkArg() everything
 
 
 ScreenContainer = {}
 function ScreenContainer:new(name, backgroundColour)
+    checkArg(1, name, "string")
+    checkArg(2, backgroundColour, "string", "nil")
     local t = setmetatable({}, { __index = ScreenContainer})
 
     t.name = name
@@ -48,6 +51,7 @@ end
 
 Box = {}
 function Box:new(name, posX, posY, width, height, colour, borderColour)
+    checkArg(6, colour, "number")
     local t = setmetatable({}, { __index = Box})
 
     t.name = name
@@ -69,10 +73,7 @@ end
 
 function Box:draw(boxColour, borderColour)
     if boxColour == nil then boxColour = self.colour end
-    -- print("1) borderColour: "..(borderColour or "nil")..", self.borderColour: "..self.borderColour)
     if borderColour == nil then borderColour = self.borderColour end
-    -- print("2) borderColour: "..borderColour..", self.borderColour: "..self.borderColour)
-
 
     -- Main box part
     gpu.setBackground(boxColour)
