@@ -4,6 +4,7 @@
 local component = require("component")
 local event = require("event")
 local modem = component.modem
+local redstone = component.redstone
 
 local port = 2319
 modem.open(port)
@@ -45,11 +46,12 @@ end
 
 
 MiningNode = {}
-function MiningNode:new(id, miningState, nodeBots)
+function MiningNode:new(id, miningState, nodeBots, redstoneSide)
     local t = setmetatable({}, { __index = MiningNode})
     t.id = id
     t.miningState = (miningState or "new") -- new, active, sealing_off, sealed, renabling, error
     t.nodeBots = (nodeBots or {})
+    t.redstoneSide = redstoneSide
     return t
 end
 function MiningNode:newFromSerialized(t)
@@ -57,7 +59,7 @@ function MiningNode:newFromSerialized(t)
     for i, bot in pairs(t.nodeBots) do
         table.insert(newBots, NodeBot:newFromSerialized(bot))
     end
-    return MiningNode:new(t.id, t.miningState, newBots)
+    return MiningNode:new(t.id, t.miningState, newBots, t.redstoneSide)
 end
 
 function MiningNode:someTestStuff()
@@ -92,6 +94,37 @@ function MiningNode:botsAreConnected()
     return true
 end
 
+function MiningNode:frameMotor(action)
+    local power = nil
+    if      action == "up" then power = 3
+    else if action == "down" then power = 4
+    else if action == "off" then power = 0
+    else error("action: '"..action.."' not recognised") end
+    redstone.setOutput(self.redstoneSide, power)
+end
+
+
+-- todo: create bot side response
+function MiningNode:getConfirmationOfSealedFromNodeBots()
+    local attempts = 0
+    local success = false
+    while (not success) do
+        local _, _, from, port, _, message = event.pull(1, "modem_message")
+        for i, bot in pairs(self.nodeBots) do
+            if (from == bot.address) and (message == "sealed") then
+                bot.miningState = "sealed"
+                bot:sendWithConfirm("coolio", "gott'ya fam")
+            end
+        end
+        success = (self.nodeBots[1].miningState == "sealed") and (self.nodeBots[2].miningState == "sealed")
+        
+        attempts = attempts +1
+        if (attempts < maxAttempts) then 
+            self:frameMotor("off")
+            error("Attempts excceded waiting for node bots to confirm 'sealed'")
+        end
+    end
+end
 
 
 
@@ -103,28 +136,34 @@ end
 function MiningNode:sealOff()
     -- todo: improve errors to work with the UI
     assert(botsAreConnected(), "Bots must be connected to seal off this node!")
-    --! set that laser to "sealing off"
+    
     self.miningState = "sealing_off"
-    -- todo --->>
-            -- redstone trigger the laser retraction
-            --? will probably end up doing this with another computer to control the redstone ...so send a msg to that
-
-    -- network msg to robots
+    -- network msg robots to seal off
     for i, bot in pairs(self.nodeBots) do
+        ---- will retract lasers and disconnect cables
         if not bot:sendWithConfirm("seal_off", "sealing_off") then 
             error("Bot "..strsub(bot.address, 1, 6).."... did not reply to 'seal_off'")
         end
     end
 
 
+    -- redstone trigger the frame motor: down
+    self:frameMotor("down")
+    os.sleep(5) -- todo: change to check current time
+    -- should get a network message from the robots when they finish
+    self:getConfirmationOfSealedFromNodeBots()
 
--- redstone trigger the frame motor
--- msg back to main computer / http server
+    -- kinda wait more time
+    -- assume sealed off
+    -- set as sealed
+    self.miningState = "sealed"
+
+end
+
+
+
+-- //msg back to main computer / http server
 -- wait a bunch of time
--- should get a network message from the robots when they finish
--- kinda wait more time
--- assume sealed off
--- set as sealed
 
 
 -- enable button for turning the laser back on
