@@ -134,6 +134,7 @@ end
 -- seal off button
 
 function MiningNode:sealOff()
+    -- todo: change UI to sealing off
     -- todo: improve errors to work with the UI
     assert(botsAreConnected(), "Bots must be connected to seal off this node!")
     
@@ -146,18 +147,19 @@ function MiningNode:sealOff()
         end
     end
 
-
     -- redstone trigger the frame motor: down
     self:frameMotor("down")
-    os.sleep(5) -- todo: change to check current time
+    local frameMotorDurration = 10
+    local frameMotorStartTime = computer.uptime()
     -- should get a network message from the robots when they finish
     self:getConfirmationOfSealedFromNodeBots()
 
-    -- kinda wait more time
-    -- assume sealed off
-    -- set as sealed
-    self.miningState = "sealed"
+    while (computer.uptime() - frameMotorStartTime < frameMotorDurration) do
+        os.sleep(0.5)
+    end
 
+    -- assume sealed off
+    self.miningState = "sealed_off"
 end
 
 
