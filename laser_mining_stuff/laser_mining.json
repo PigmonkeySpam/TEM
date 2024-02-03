@@ -1,0 +1,18 @@
+{
+    {
+        "miningState": "new",
+        "nodeBots": [
+            {
+                "address": "cd839e36-745c-4bf7-95ea-c5a860afd1d5",
+                "miningState": "new",
+                "picDurability": 69420
+            },
+            {
+                "address": "?",
+                "miningState": "new",
+                "picDurability": 69420}
+
+        ]
+    },
+    ["something else"]
+}
