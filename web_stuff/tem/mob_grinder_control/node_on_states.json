@@ -1,0 +1,47 @@
+[
+    {
+        "mobName": "spider",
+        "automaticControl": true,
+        "turnOffTime": 1699187851
+    },
+    {
+        "mobName": "zombie",
+        "automaticControl": true,
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "blizz",
+        "automaticControl": true,
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "blitz",
+        "automaticControl": true,
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "blitz",
+        "automaticControl": true,
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "blaze",
+        "automaticControl": true,
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "creeper",
+        "automaticControl": true,
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "witch",
+        "automaticControl": true,
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "slime",
+        "automaticControl": true,
+        "turnOffTime": 0
+    }
+]

@@ -1,0 +1,38 @@
+[
+    {
+        "mobName": "spider",
+        "turnOffTime": 1699137078
+    },
+    {
+        "mobName": "zombie",
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "blizz",
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "blitz",
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "basalz",
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "blaze",
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "creeper",
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "witch",
+        "turnOffTime": 0
+    },
+    {
+        "mobName": "slime",
+        "turnOffTime": 0
+    }
+]

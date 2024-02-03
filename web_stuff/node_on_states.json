@@ -1,0 +1,7 @@
+[
+    {"mobName": "creeper", "state": true, "offTime": 0},
+    {"mobName": "spider", "state": false, "offTime": 0},
+    {"mobName": "blizz", "state": true, "offTime": 0},
+    {"mobName": "blitz", "state": true, "offTime": 0},
+    {"mobName": "basalz", "state": true, "offTime": 0}
+]
