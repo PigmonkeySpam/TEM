@@ -1,0 +1,8 @@
+{
+    "passkey": "aaa",
+    "playername": "PigmonkeySpam",
+    "inventory": [
+        {"size":64, "typeInfo":["minecraft:cobblestone", 0]},
+        {"size":5, "typeInfo":["minecraft:cobblestone", 0]}
+    ]
+}
