@@ -1,0 +1,6 @@
+{
+    {name="blaze", side="bottom"}, 
+    {name="blitz", side="back"}, 
+    {name="blizz", side="left"}, 
+    {name="basalz", side="right"}
+}

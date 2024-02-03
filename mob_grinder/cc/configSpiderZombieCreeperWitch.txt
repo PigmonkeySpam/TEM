@@ -1,0 +1,6 @@
+{
+    {name="spider", side="bottom"}, 
+    {name="zombie", side="back"}, 
+    {name="creeper", side="left"}, 
+    {name="witch", side="right"}
+}

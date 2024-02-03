@@ -1,0 +1,8 @@
+this is kinda dumb actually ...the slime balls use ordict
+
+
+{
+    {name="pink", side="bottom"}, 
+    {name="blue", side="back"}, 
+    {name="green", side="left"}
+}
